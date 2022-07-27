@@ -22,7 +22,7 @@ class model:
         self.startj = (s0, s1, s2, s3)
         self._init()
         
-    def move(self, s0, s1, s2, s3):
+    def moveM(self, s0, s1, s2, s3):
         self.mv = (s0, s1, s2, s3)
         self.update()
         
@@ -45,6 +45,45 @@ class model:
         self.j1.rot(s1)
         self.j2.rot(s2)
         self.j3.rot(s3)
+        
+    def fwkinematics(self):
+        l1 = self.b1.getLenght()
+        l2 = self.b2.getLenght()
+        l3 = self.b3.getLenght()
+        l4 = self.b4.getLenght()
+        s0, s1, s2, s3 = self.mv
+        
+        rx = l2 * cos(radians(s1)) + l3 * cos(radians(s2)) + l4 * cos(radians(s3))
+        y = l1 + l2 * sin(radians(s1)) + l3 * sin(radians(s2)) + l4 * sin(radians(s3))
+        z = rx * sin(radians(s0))
+        x = rx * cos(radians(s0))
+        print(x,y,z)
+    
+    def ik2dof(self, x, y):
+        l1 = 80#self.
+        l2 = 80
+        try:
+            a2 = acos((x**2+y**2-l1**2-l2**2)/(2*l1*l2))
+            a1 = atan(y/x) - atan(l2*sin(a2)/(l1+l2*cos(a2)))
+            return (degrees(a1), degrees(a2))
+        except:
+            print('Cannot reach that posssition sorry!')
+            return (0,0)
+            
+        
+    
+    def manarie(self,x,y,z):
+        #z=80
+        if y==0: y=0.001
+        a0 = atan(z/y)
+        l = sqrt(y**2 + z**2) 
+        a1, a2 = self.ik2dof(x,l)
+        a3 = 90-a1-a2
+        self.moveM(a0,a1,a2,a3)
+        
+        #print(x,y,z)
+        
+        
         
         
         
