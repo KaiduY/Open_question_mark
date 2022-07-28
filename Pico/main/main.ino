@@ -21,7 +21,8 @@ Servo s[4];
 int initial_joints[] = {120, 90, 90, 90};
 
 const float pi = 3.14159267;
-
+long long startT = millis();
+int state = 0;
 float degres(float radins) {
   return radins / 2 / pi * 360;
 }
@@ -60,9 +61,9 @@ void manarie(float x, float y, float z) {
   Serial.print(a3);
   if(!(isnan(a0) || isnan(a1) || isnan(a2) || isnan(a3))){
   s[0].write(a0 + off);
-  s[1].write(a1 + off);
+  s[1].write(off - a1);
   s[2].write(a2 + off);
-  s[3].write(a3 + off);
+  s[3].write(off - a3);
   }
   delay(100);
 }
@@ -71,9 +72,9 @@ void setup() {
   Serial.begin(115200);
   flag.attach(FLAG);
   s[0].attach(S0);
-  s[1].attach(S3);
+  s[1].attach(S1);
   s[2].attach(S2);
-  s[3].attach(S1);
+  s[3].attach(S3);
 
   flag.write(80);
   for (int i = 0; i < 4; i++)
@@ -150,6 +151,15 @@ void loop() {
 
     }
 
+  }
+
+  if(millis() - startT > 5000){
+    if(state == 0)
+      state=1;
+     else
+      state=0;
+     startT = millis();
+     flag.write(90*state);
   }
    //manarie(100, 80, 20);
    //i=i+1;

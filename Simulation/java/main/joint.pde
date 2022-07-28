@@ -2,6 +2,7 @@
 class joint{
   arm arm1 = null;
   arm arm2 = null;
+  
   joint(arm arm1, arm arm2)
   {
     this.arm1 = arm1;

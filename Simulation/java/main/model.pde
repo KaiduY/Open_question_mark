@@ -9,6 +9,8 @@ class model{
   float start[] = {0,0,0};
   float startj[] = {0,0,0,0};
   float mv[] = {0,0,0,0,0};
+  float ik0 = 0;
+  float ik1 = 0;
 
   model(float normal_lenght)
   {
@@ -21,85 +23,115 @@ class model{
     j3 = new joint(b3, b4);
   }
   
-    void setStartingPossition(float x, float y, float z):
+    void setStartingPossition(float x, float y, float z){
         start[0] = x;
         start[1] = y;
         start[2] = z;
+    }
     
-    void setStartingPossitionJoints(float s0, float s1, float s2, float s3):
+    void setStartingPossitionJoints(float s0, float s1, float s2, float s3){
         startj[0] = s0;
         startj[1] = s1;
         startj[2] = s2;
         startj[3] = s3;
-        init()
+        init();
+    }
         
-    void moveM(self, s0, s1, s2, s3):
-        self.mv = (s0, s1, s2, s3)
-        self.update()
+    void moveM(float s0, float s1, float s2, float s3){
+        mv[0] = s0;
+        mv[1] = s1;
+        mv[2] = s2;
+        mv[3] = s3;
+        update();
+    }
         
-    void init(self):
-        x,y,z = self.start
-        s0, s1, s2, s3 = self.startj
-        translate(x,y,z)
-        rotateY(s0)
-        self.b1.pos(0,0,0,0,0)
-        self.j1.rot(s1)
-        self.j2.rot(s2)
-        self.j3.rot(s3)
+    void init(){
+        float x = start[0];
+        float y = start[1];
+        float z = start[2];
         
-    void update(self):
-        x,y,z = self.start
-        s0, s1, s2, s3 = self.mv
-        translate(x,y,z)
-        rotateY(s0)
-        self.b1.pos(0,0,0,0,0)
-        self.j1.rot(s1)
-        self.j2.rot(s2)
-        self.j3.rot(s3)
+        float s0 = startj[0];
+        float s1 = startj[1];
+        float s2 = startj[2];
+        float s3 = startj[3];
         
-    void fwkinematics(self):
-        l1 = self.b1.getLenght()
-        l2 = self.b2.getLenght()
-        l3 = self.b3.getLenght()
-        l4 = self.b4.getLenght()
-        s0, s1, s2, s3 = self.mv
+        translate(x,y,z);
+        rotateY(s0);
+        b1.pos(0,0,0,0,0);
+        j1.rot(s1);
+        j2.rot(s2);
+        j3.rot(s3);
+    }
         
-        rx = l2 * cos(radians(s1)) + l3 * cos(radians(s2)) + l4 * cos(radians(s3))
-        y = l1 + l2 * sin(radians(s1)) + l3 * sin(radians(s2)) + l4 * sin(radians(s3))
-        z = rx * sin(radians(s0))
-        x = rx * cos(radians(s0))
-        print(x,y,z)
+    void update(){
+        float x = start[0];
+        float y = start[1];
+        float z = start[2];
+        float s0 = mv[0];
+        float s1 = mv[1];
+        float s2 = mv[2];
+        float s3 = mv[3];
+        translate(x,y,z);
+        rotateY(s0);
+        b1.pos(0,0,0,0,0);
+        j1.rot(s1);
+        j2.rot(s2);
+        j3.rot(s3);
+    }
+        
+    void fwkinematics(){
+        float l1 = b1.getLenght();
+        float l2 = b2.getLenght();
+        float l3 = b3.getLenght();
+        float l4 = b4.getLenght();
+        float s0 = mv[0];
+        float s1 = mv[1];
+        float s2 = mv[2];
+        float s3 = mv[3];
+        
+        float rx = l2 * cos(radians(s1)) + l3 * cos(radians(s2)) + l4 * cos(radians(s3));
+        float y = l1 + l2 * sin(radians(s1)) + l3 * sin(radians(s2)) + l4 * sin(radians(s3));
+        float z = rx * sin(radians(s0));
+        float x = rx * cos(radians(s0));
+        //print(x,y,z)
+    }
     
-    void ik2dof(self, x, y):
-        l1 = 80//#self.
-        l2 = 80
-        try:
-            a2 = acos((x**2+y**2-l1**2-l2**2)/(2*l1*l2))
-            a1 = atan(y/x) - atan(l2*sin(a2)/(l1+l2*cos(a2)))
-            return (degrees(a1), degrees(a2))
-        catch:
-            print('Cannot reach that posssition sorry!')
-            return (0,0)
+    void ik2dof(float x, float y){
+        float l1 = 80;//#self.
+        float l2 = 80;
+        try{
+            float a2 = acos((pow(x,2)+pow(y,2)-pow(l1,2)-pow(l2,2))/(2*l1*l2));
+            float a1 = atan(y/x) - atan(l2*sin(a2)/(l1+l2*cos(a2)));
+            ik0 = degrees(a1);
+            ik1 = degrees(a2);
+        }
+        catch (Exception e){
+            print("Cannot reach that posssition sorry!");
+        }
+            
+    }
             
         
     
-    void manarie(self,x,y,z):
-        dt = 90
-        if y==0: y=0.001
-        a0 = atan(z/y)
-        l = sqrt(y**2 + z**2) 
-        a1, a2 = self.ik2dof(x,l)
-        a3 = 90-a1-a2
-        a0 = max(a0, -dt)
-        a0 = min(a0, dt)
-        a1 = max(a1, -dt)
-        a1 = min(a1, dt)
-        a2 = max(a2, -dt)
-        a2 = min(a2, dt)
-        a3 = max(a3, -dt)
-        a3 = min(a3, dt)
-        self.moveM(a0,a1,a2,a3)
-  
+    void manarie(float x,float y,float z){
+        float dt = 90;
+        y = y==0 ? 0.01 : y;
+        float a0 = atan(z/y);
+        float l = sqrt(pow(y,2) + pow(z,2));
+        ik2dof(x,l);
+        float a1 = ik0;
+        float a2 = ik1;
+        float a3 = 90-a1-a2;
+        a0 = max(a0, -dt);
+        a0 = min(a0, dt);
+        a1 = max(a1, -dt);
+        a1 = min(a1, dt);
+        a2 = max(a2, -dt);
+        a2 = min(a2, dt);
+        a3 = max(a3, -dt);
+        a3 = min(a3, dt);
+        moveM(a0,a1,a2,a3);
+    }
 
   
 }
