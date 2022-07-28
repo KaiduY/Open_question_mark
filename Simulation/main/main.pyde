@@ -1,10 +1,14 @@
 from model import model
 import sys
+from hardware import pico
 
 model = model(50)
+pico = pico()
 
 def setup():
     global model
+    global pico
+
     size(512, 512, P3D)
     model.setStartingPossition(200, 300, 0)
     model.setStartingPossitionJoints(30, 20, 20, 20)
@@ -18,11 +22,10 @@ def draw():
     lights()
     #model.moveM(i,20,20,20)
     model.manarie(10,100,i)
-    model.fwkinematics()
+    #model.fwkinematics()
     i=i+0.1
     #print(i)
     i=min(i, 200)
 
-    
 
     

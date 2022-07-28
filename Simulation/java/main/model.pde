@@ -1,32 +1,43 @@
-from arm import arm
-from joint import joint
+class model{
+  arm b1 = null;
+  arm b2 = null;
+  arm b3 = null;
+  arm b4 = null;
+  joint j1 = null;
+  joint j2 = null;
+  joint j3 = null;
+  float start[] = {0,0,0};
+  float startj[] = {0,0,0,0};
+  float mv[] = {0,0,0,0,0};
 
-class model:
+  model(float normal_lenght)
+  {
+    b1 = new arm(normal_lenght);
+    b2 = new arm(normal_lenght);
+    b3 = new arm(normal_lenght);
+    b4 = new arm(normal_lenght);
+    j1 = new joint(b1, b2);
+    j2 = new joint(b2, b3);
+    j3 = new joint(b3, b4);
+  }
+  
+    void setStartingPossition(float x, float y, float z):
+        start[0] = x;
+        start[1] = y;
+        start[2] = z;
     
-    def __init__(self, normal_lenght):
-        self.b1 = arm(normal_lenght)
-        self.b2 = arm(normal_lenght)
-        self.b3 = arm(normal_lenght)
-        self.b4 = arm(normal_lenght)
-        self.j1 = joint(self.b1, self.b2)
-        self.j2 = joint(self.b2, self.b3)
-        self.j3 = joint(self.b3, self.b4)
-        self.start = (0,0,0)
-        self.startj = (0,0,0,0)
-        self.mv = (0,0,0,0,0)
-    
-    def setStartingPossition(self, x, y, z):
-        self.start = (x, y, z)
-    
-    def setStartingPossitionJoints(self, s0, s1, s2, s3):
-        self.startj = (s0, s1, s2, s3)
-        self._init()
+    void setStartingPossitionJoints(float s0, float s1, float s2, float s3):
+        startj[0] = s0;
+        startj[1] = s1;
+        startj[2] = s2;
+        startj[3] = s3;
+        init()
         
-    def moveM(self, s0, s1, s2, s3):
+    void moveM(self, s0, s1, s2, s3):
         self.mv = (s0, s1, s2, s3)
         self.update()
         
-    def _init(self):
+    void init(self):
         x,y,z = self.start
         s0, s1, s2, s3 = self.startj
         translate(x,y,z)
@@ -36,7 +47,7 @@ class model:
         self.j2.rot(s2)
         self.j3.rot(s3)
         
-    def update(self):
+    void update(self):
         x,y,z = self.start
         s0, s1, s2, s3 = self.mv
         translate(x,y,z)
@@ -46,7 +57,7 @@ class model:
         self.j2.rot(s2)
         self.j3.rot(s3)
         
-    def fwkinematics(self):
+    void fwkinematics(self):
         l1 = self.b1.getLenght()
         l2 = self.b2.getLenght()
         l3 = self.b3.getLenght()
@@ -59,20 +70,20 @@ class model:
         x = rx * cos(radians(s0))
         print(x,y,z)
     
-    def ik2dof(self, x, y):
-        l1 = 80#self.
+    void ik2dof(self, x, y):
+        l1 = 80//#self.
         l2 = 80
         try:
             a2 = acos((x**2+y**2-l1**2-l2**2)/(2*l1*l2))
             a1 = atan(y/x) - atan(l2*sin(a2)/(l1+l2*cos(a2)))
             return (degrees(a1), degrees(a2))
-        except:
+        catch:
             print('Cannot reach that posssition sorry!')
             return (0,0)
             
         
     
-    def manarie(self,x,y,z):
+    void manarie(self,x,y,z):
         dt = 90
         if y==0: y=0.001
         a0 = atan(z/y)
@@ -88,10 +99,7 @@ class model:
         a3 = max(a3, -dt)
         a3 = min(a3, dt)
         self.moveM(a0,a1,a2,a3)
-        
-        #print(x,y,z)
-        
-        
-        
-        
-        
+  
+
+  
+}
